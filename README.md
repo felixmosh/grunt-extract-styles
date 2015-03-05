@@ -22,14 +22,14 @@ grunt.loadNpmTasks('grunt-extract-styles');
 
 ### Overview
 1. In your project's Gruntfile, add a section named `extractStyles` to the data object passed into `grunt.initConfig()`.
-2. In your `HTML` file add to css href url this suffix `?__extractStyles=extracted-style-filename.css`.
+2. In your `HTML` file add to style href url the suffix `?__extractStyles=extracted-style-filename.css`.
 
 ### Options
 
 #### options.pattern
 Type: `RegExp`
 
-Mandatory parameter, the pattern that match the declaration for the extracted styles.
+Mandatory parameter, the pattern that matchs the declaration for the extracted styles.
 
 #### options.remove
 Type: `Boolean`
@@ -41,19 +41,19 @@ Whether or not to remove the matching declarations from the original stylesheet.
 Type: `function`
 Default: `false`
 
-Pre-process the source file content
+Pre-process function that apply on the matched by `identifierPattern` source file content
 
 #### options.postProcess
 Type: `function`
 Default: `false`
 
-Post-process the source file content
+Post-process function that apply on the output content files (original & extracted)
 
 #### options.identifierPattern
 Type: `RegExp`
 Default: `/<link.*href="(.*\?__extractStyles=([^"]+))".*>/g`
 
-The pattern to match the source css filed to extract from
+Pattern to match `CSS` links insite given `HTML` to extract declarations from.
 
 For example if your options are:
 
@@ -94,7 +94,6 @@ This will be extracted:
 
 #### Splitting Wix tpa params into their own stylesheet
 
->By default, the matching rules are removed from `style.css`.
 #####Gruntfile:
 ```js 
 grunt.initConfig({
@@ -130,8 +129,7 @@ grunt.initConfig({
 	<title>Demo</title>
 	<link href="style.css?__extractStyles=wix-styles.css?__inline=true" rel="stylesheet" />
 </head>
-<body>
-</body>
+<body></body>
 </html>
 ```
 
@@ -190,8 +188,7 @@ Will generate in .tmp folder to following files:
 	<link href="style.css" rel="stylesheet" />
 	<link href="wix-style.css?__inline=true" rel="stylesheet" />
 </head>
-<body>
-</body>
+<body></body>
 </html>
 ```
 #####.tmp/style.css
@@ -249,7 +246,7 @@ Will generate in .tmp folder to following files:
 	}
 }
 ```
->By default, the matching rules are removed from `style.css` (controlled by `remove` property).
+>Note: By default, the matching rules are removed from `style.css` (set by `remove` property).
 
 ## Credit
 
