@@ -1,0 +1,28 @@
+.tpa-first:hover {
+	color: {{tpa-color-1}};
+}
+
+.tpa-second {
+	{{Body-M}};
+}
+
+.only-tpa {
+	color: {{tpa-color-2}};
+}
+
+@media (min-width: 300px) and (max-width: 730px) {
+	.tpa-first:hover {
+		color: {{tpa-color-1}};
+	}
+
+	.tpa-second {
+		{{Body-M}};
+	}
+
+	.only-tpa {
+		color: {{tpa-color-2}};
+	}
+	.tpa-first:hover {
+		width: {{ tpa-width }};
+	}
+}
