@@ -147,7 +147,7 @@ function extractStyles(sourceFile, destFiles, options, grunt) {
 
 	// Write the newly split file.
 	grunt.file.write(destFiles.extracted, newCSS);
-	grunt.log.write('File "' + destFiles.source + '" was created. - ');
+	grunt.log.write('File "' + destFiles.extracted + '" was created. - ');
 	grunt.log.ok();
 
 	// Write the destination file
