@@ -68,7 +68,27 @@ module.exports = function (grunt) {
 				cwd: 'test/fixtures/',
 				src: '*.html',
 				dest: '.tmp/without_remove/'
-			}
+			},
+      with_remain: {
+        options: {
+          pattern: /\[\[[^\]]+\]\]/,
+          remainSuffix: '_rest',
+          preProcess: function (css) {
+            var ret = css.replace(/font:;{{([^}]+)}};/g, 'font: [[$1]];');
+            ret = ret.replace(/{{([^}]+)}}/g, '[[$1]]');
+            return ret;
+          },
+          postProcess: function (css) {
+            var ret = css.replace(/font: \[\[([^\]]+)\]\];/g, '{{$1}};');
+            ret = ret.replace(/\[\[([^\]}]+)\]\]/g, '{{$1}}');
+            return ret;
+          }
+        },
+        expand: true,
+        cwd: 'test/fixtures/',
+        src: '*.html',
+        dest: '.tmp/with_remain/'
+      }
 		},
 
 		// Unit tests.

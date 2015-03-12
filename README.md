@@ -49,19 +49,29 @@ Default: `false`
 
 Post-process function that apply on the output content files (original & extracted)
 
-#### options.identifierPattern
-Type: `RegExp`
-Default: `/<link.*href="(.*\?__extractStyles=([^"]+))".*>/g`
+#### options.remainSuffix
+Type: `string`
+Default: `_remain`
 
-Pattern to match `CSS` links insite given `HTML` to extract declarations from.
+The filename suffix of the
+
+#### options.linkIdentifier
+Type: `string`
+Default: `?__extractStyles`
+
+Identifier of the links in the HTML to extract from. This string will convert to the following `Regex`: <link.*href="(.*' + **linkIdentifier** + '=([^"]+))".*>
 
 For example if your options are:
 
 ```js
-options: {
-  pattern: /\[\[[^\]]+\]\]/,
-  src: '*.html',
-  dest: '.tmp/'
+{
+    options: {
+        pattern: /\[\[[^\]]+\]\]/,
+    },
+    files: [{
+        dest: '.tmp/',
+        src: '*.html'
+    }]
 }
 ```
 
