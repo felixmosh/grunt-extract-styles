@@ -53,13 +53,16 @@ Post-process function that apply on the output content files (original & extract
 Type: `string`
 Default: `_remain`
 
-The filename suffix of the
+The filename suffix of the remaining content.
 
 #### options.linkIdentifier
 Type: `string`
 Default: `?__extractStyles`
 
-Identifier of the links in the HTML to extract from. This string will convert to the following `Regex`: <link.*href="(.*' + **linkIdentifier** + '=([^"]+))".*>
+Identifier of the links in the HTML to extract from. This string will convert to the following `Regex`: 
+```js
+<link.*href="(.*' + linkIdentifier + '=([^"]+))".*>
+```
 
 For example if your options are:
 
