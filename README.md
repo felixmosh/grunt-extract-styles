@@ -198,7 +198,7 @@ Will generate in .tmp folder to following files:
 <head lang="en">
 	<meta charset="UTF-8">
 	<title>Demo</title>
-	<link href="style.css" rel="stylesheet" />
+	<link href="style_remain.css" rel="stylesheet" />
 	<link href="wix-style.css?__inline=true" rel="stylesheet" />
 </head>
 <body></body>
