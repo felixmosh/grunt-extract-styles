@@ -20,13 +20,13 @@ function getMatches(fileContent, options, sourceDir, destDir) {
     var pos = sourceFilePath.lastIndexOf('.');
     var remainFilePath = sourceFilePath.substring(0, pos) + options.remainSuffix + sourceFilePath.substring(pos);
     var destFile = matches[2];
-    var extactedFilePath = sourceFilePath;
-    extactedFilePath = (extactedFilePath.indexOf('/') > -1) ? path.dirname(extactedFilePath) + '/' : '';
-    extactedFilePath += destFile;
+    var extractedFilePath = sourceFilePath;
+    extractedFilePath = (extractedFilePath.indexOf('/') > -1) ? path.dirname(extractedFilePath) + '/' : '';
+    extractedFilePath += destFile;
 
     var originalLink = matches[0];
     var replaceOrgLink = originalLink.replace(hrefLink, remainFilePath);
-    var replaceExtractedLink = originalLink.replace(hrefLink, extactedFilePath);
+    var replaceExtractedLink = originalLink.replace(hrefLink, extractedFilePath + options.extractedSuffix);
 
     destFilePaths.push({
       originalLink: originalLink,
@@ -35,10 +35,11 @@ function getMatches(fileContent, options, sourceDir, destDir) {
         replaceExtractedLink
       ],
       sourceFile: sourceDir + sourceFilePath,
+      remainFile: remainFilePath,
       destFiles: {
         source: destDir + sourceFilePath,
         remain: destDir + remainFilePath,
-        extracted: destDir + extactedFilePath.split('?')[0]
+        extracted: destDir + extractedFilePath.split('?')[0]
       }
     });
   }
@@ -74,12 +75,12 @@ function parseCss(css, options, newCSS) {
           handleDeclaration(decl, newRule, options);
         });
 
-
         if (newRule.decls.length) {
           newCSS.append(newRule);
         }
 
-      } else if (rule.parent.name === 'media') {
+      }
+      else if (rule.parent.name === 'media') {
         var newAtRule = rule.parent.clone();
         newAtRule.eachRule(function (childRule) {
           childRule.removeSelf();
@@ -88,7 +89,8 @@ function parseCss(css, options, newCSS) {
         var atRuleKey = newAtRule.params + '';
         if (!atRules.hasOwnProperty(atRuleKey)) {
           atRules[atRuleKey] = newAtRule;
-        } else {
+        }
+        else {
           newAtRule = atRules[atRuleKey];
         }
 
@@ -157,16 +159,93 @@ function extractStyles(sourceFile, destFiles, options, grunt) {
   grunt.log.ok();
 }
 
+function concatFiles(file, concatFilePath, grunt) {
+  var config = grunt.config(['concat', 'generated']);
+
+  var files = grunt.task.normalizeMultiTaskFiles(config)
+    // Only work on the original src/dest, since files.src is a [GETTER]
+    .map(function (files) {
+      return files.orig;
+    }).filter(function (fileItem) {
+      return fileItem.dest === concatFilePath;
+    });
+
+  var isFullBlock = true;
+  files.forEach(function (files) {
+    isFullBlock = isFullBlock && files.src.length > 0;
+
+    files.src.push(file.destFiles.remain);
+  });
+
+  // Change link src to the usemin dest
+  var concatFile = path.basename(concatFilePath);
+  var remainFileName = path.basename(file.remainFile);
+  file.replaceLinks[0] = file.replaceLinks[0].replace(remainFileName, concatFile);
+
+  // Append css remain file to src
+  if (isFullBlock) {
+    file.replaceLinks.shift(); // Remove the first link
+  }
+
+  grunt.config(['concat', 'generated'], config); //save back the modified config
+
+  grunt.log.writeln('Added "' + file.destFiles.remain.cyan + '" to "<!-- build:css({.tmp,app}) ' + concatFilePath.yellow + ' -->" Usemin css block.');
+}
+
+function concatUseminFiles(ext, file, grunt) {
+  var config = grunt.config(['cssmin', 'generated']);
+
+  if (!config) {
+    return false;
+  }
+
+  // Find cssmin destination(s) matching ext
+  var matches = grunt.task.normalizeMultiTaskFiles(config)
+    .map(function (files) {
+      return files.orig;
+    })
+    .filter(function (files) {
+      return ext === files.dest.substr(-ext.length);
+    });
+
+  // *Something* should've matched
+  if (!matches.length) {
+    grunt.log.warn('Could not find usemin.generated path matching: ' + ext.red);
+
+    return false;
+  }
+
+  var match = matches.shift();
+
+  var concatFilePath = match.src.pop();
+
+  // Finally, modify concat target sourced by matching uglify target
+  concatFiles(file, concatFilePath, grunt);
+}
+
+function handleHTML(fileContent, options, match, grunt) {
+
+  if (options.usemin) {
+    concatUseminFiles('.css', match, grunt);
+  }
+
+  fileContent = fileContent.replace(match.originalLink, match.replaceLinks.join('\n\t'));
+
+  return fileContent;
+}
+
 module.exports = function (grunt) {
   grunt.registerMultiTask('extractStyles', 'Extract styles from css based on decelerations matching.', function () {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-      pattern: false, // Pattern to match css declaration
+      pattern: null, // Pattern to match css declaration
       remove: true, // Should we strip the matched rules from the src style sheet?
-      preProcess: false,
-      postProcess: false,
-      remainSuffix: '_remain', // remaining filename suffix
-      linkIdentifier: '?__extractStyles' // The identifier of link src
+      preProcess: null,
+      postProcess: null,
+      remainSuffix: '.remain', // remaining filename suffix
+      extractedSuffix: '', // suffix for the extracted file link
+      linkIdentifier: '?__extractStyles', // The identifier of link src
+      usemin: false // if true, the remaining link will be added to the last Usemin css block
     });
 
     if (!options.pattern) {
@@ -187,23 +266,24 @@ module.exports = function (grunt) {
         var matches = getMatches(htmlFileContent, options, baseDir, destDir);
 
         matches.forEach(function (match) {
-          if (!grunt.file.exists(match.sourceFile)) {
-            grunt.fail.warn('Source file "' + match.sourceFile + '" not found.');
-          } else {
-            extractStyles(match.sourceFile, match.destFiles, options, grunt);
+            if (!grunt.file.exists(match.sourceFile)) {
+              grunt.fail.warn('Source file "' + match.sourceFile + '" not found.');
+            } else {
+              extractStyles(match.sourceFile, match.destFiles, options, grunt);
 
-            htmlFileContent = htmlFileContent.replace(match.originalLink, match.replaceLinks.join('\n\t'));
+              htmlFileContent = handleHTML(htmlFileContent, options, match, grunt);
 
-            if (file.orig.expand) {
-              filepath = filepath.replace(baseDir, '');
+              if (file.orig.expand) {
+                filepath = filepath.replace(baseDir, '');
+              }
+
+              grunt.file.write(destDir + filepath, htmlFileContent);
+
+              grunt.log.write('Extracted styles from ' + match.sourceFile + '. - ');
+              grunt.log.ok();
             }
-
-            grunt.file.write(destDir + filepath, htmlFileContent);
-
-            grunt.log.write('Extracted styles from ' + match.sourceFile + '... - ');
-            grunt.log.ok();
           }
-        });
+        );
       });
     });
   });

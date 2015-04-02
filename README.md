@@ -39,21 +39,27 @@ Whether or not to remove the matching declarations from the original stylesheet.
 
 #### options.preProcess
 Type: `function`
-Default: `false`
+Default: `null`
 
 Pre-process function that apply on the matched by `identifierPattern` source file content
 
 #### options.postProcess
 Type: `function`
-Default: `false`
+Default: `null`
 
 Post-process function that apply on the output content files (original & extracted)
 
 #### options.remainSuffix
 Type: `string`
-Default: `_remain`
+Default: `.remain`
 
-The filename suffix of the remaining content.
+The filename suffix of the remaining content. (`style.css` => `style.remain.css`)
+
+#### options.extractedSuffix
+Type: `string`
+Default: ``
+
+suffix for the extracted file link. (with `extractedSuffix="?inline=true"` `extracted.css` => `extracted.css?inline=true`)
 
 #### options.linkIdentifier
 Type: `string`
@@ -63,6 +69,20 @@ Identifier of the links in the HTML to extract from. This string will convert to
 ```js
 <link.*href="(.*' + linkIdentifier + '=([^"]+))".*>
 ```
+
+#### options.usemin
+Type: `boolean`
+Default: `false`
+
+If `true` the plugin will try to add the `remain` file to the last css block.
+>Note: If there is no usemin css block you can add an empty css block.
+
+```html
+    <!-- build:css({.tmp}) main.css -->
+	<!-- endbuild -->
+	<link href="style.css?__extractStyles=inline.css" rel="stylesheet" />
+```
+Will extract the css declerations from style.css, save them to inline.css and `style.remian.css` file will be added to `main.css` concat & minified.
 
 For example if your options are:
 
@@ -125,7 +145,8 @@ grunt.initConfig({
 						var ret = css.replace(/font: \[\[([^\]]+)\]\];/g, '{{$1}};');
 						ret = ret.replace(/\[\[([^\]}]+)\]\]/g, '{{$1}}');
 						return ret;
-					}
+					},
+					extractedSuffix: '?__inline=true'
 				},
 				src: '*.html',
 				dest: '.tmp/'
@@ -140,7 +161,7 @@ grunt.initConfig({
 <head lang="en">
 	<meta charset="UTF-8">
 	<title>Demo</title>
-	<link href="style.css?__extractStyles=wix-styles.css?__inline=true" rel="stylesheet" />
+	<link href="style.css?__extractStyles=wix-styles.css" rel="stylesheet" />
 </head>
 <body></body>
 </html>
@@ -198,13 +219,13 @@ Will generate in .tmp folder to following files:
 <head lang="en">
 	<meta charset="UTF-8">
 	<title>Demo</title>
-	<link href="style_remain.css" rel="stylesheet" />
+	<link href="style.remain.css" rel="stylesheet" />
 	<link href="wix-style.css?__inline=true" rel="stylesheet" />
 </head>
 <body></body>
 </html>
 ```
-#####.tmp/style.css
+#####.tmp/style.remain.css
 ```css
 .tpa-first:hover {
 	margin-left: 10px;

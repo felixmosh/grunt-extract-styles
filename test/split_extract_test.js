@@ -30,7 +30,7 @@ exports.split_styles = {
 	default_task: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/default_task/style_remain.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/default_task/style.remain.css').trim();
 		var actualRemaining = grunt.file.read('.tmp/default_task/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/default_task/index.html').trim();
 
@@ -48,7 +48,7 @@ exports.split_styles = {
 	without_remove: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/without_remove/style_remain.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/without_remove/style.remain.css').trim();
 		var actualRemaining = grunt.file.read('.tmp/without_remove/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/without_remove/index.html').trim();
 
@@ -78,6 +78,40 @@ exports.split_styles = {
 		test.equal(actualRemaining, expectedRemaining, 'should not remove styles with tpa params.');
 		test.equal(actualHtml, expectedHtml, 'should split extracted link into 2 links');
 
+
+		test.done();
+	},
+	with_extracted_suffix: function (test) {
+		test.expect(3);
+
+		var actualExtracted = grunt.file.read('.tmp/with_extracted_suffix/style.remain.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/with_extracted_suffix/wix-style.css').trim();
+		var actualHtml = grunt.file.read('.tmp/with_extracted_suffix/index_without_suffix.html').trim();
+
+		var expectedExtracted = grunt.file.read('test/expected/with_extracted_suffix/style.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/with_extracted_suffix/wix-style.css').trim();
+		var expectedHtml = grunt.file.read('test/expected/with_extracted_suffix/index.html').trim();
+
+		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
+		test.equal(actualRemaining, expectedRemaining, 'should remove styles with tpa params.');
+		test.equal(actualHtml, expectedHtml, 'should split extracted link into 2 links and add a suffix to the extracted file');
+
+		test.done();
+	},
+	with_usemin: function (test) {
+		test.expect(3);
+
+		var actualExtracted = grunt.file.read('.tmp/with_usemin/main.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/with_usemin/wix-style.css').trim();
+		var actualHtml = grunt.file.read('.tmp/with_usemin/index_with_usemin.html').trim();
+
+		var expectedExtracted = grunt.file.read('test/expected/with_usemin/main.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/with_usemin/wix-style.css').trim();
+		var expectedHtml = grunt.file.read('test/expected/with_usemin/index_with_usemin.html').trim();
+
+		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
+		test.equal(actualRemaining, expectedRemaining, 'should remove styles with tpa params and minify it.');
+		test.equal(actualHtml, expectedHtml, 'should split extracted link into 2 links and manipulate usemin to minify the remain file');
 
 		test.done();
 	}
