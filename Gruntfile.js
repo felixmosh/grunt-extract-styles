@@ -36,7 +36,7 @@ module.exports = function (grunt) {
 
 		// Before generating any new files, remove any previously-created files.
 		clean: {
-			tests:  ['.tmp']
+			tests: ['.tmp']
 		},
 
 		// Configuration to be run (and then tested).
@@ -64,43 +64,56 @@ module.exports = function (grunt) {
 				src: 'index.html',
 				dest: '.tmp/without_remove/'
 			},
-      with_remain: {
-        options: {
-          pattern: /\[\[[^\]]+\]\]/,
-          remainSuffix: '_rest',
-          preProcess: preProccess,
+			with_remain: {
+				options: {
+					pattern: /\[\[[^\]]+\]\]/,
+					remainSuffix: '_rest',
+					preProcess: preProccess,
 					postProcess: postProcess
-        },
-        expand: true,
-        cwd: 'test/fixtures/',
-        src: 'index.html',
-        dest: '.tmp/with_remain/'
-      },
-      with_extracted_suffix: {
-        options: {
-          pattern: /\[\[[^\]]+\]\]/,
+				},
+				expand: true,
+				cwd: 'test/fixtures/',
+				src: 'index.html',
+				dest: '.tmp/with_remain/'
+			},
+			with_extracted_suffix: {
+				options: {
+					pattern: /\[\[[^\]]+\]\]/,
 					extractedSuffix: '?extracted-suffix=true',
-          preProcess: preProccess,
+					preProcess: preProccess,
 					postProcess: postProcess
-        },
-        expand: true,
-        cwd: 'test/fixtures/',
-        src: 'index_without_suffix.html',
-        dest: '.tmp/with_extracted_suffix/'
-      },
-      with_usemin: {
-        options: {
-          pattern: /\[\[[^\]]+\]\]/,
+				},
+				expand: true,
+				cwd: 'test/fixtures/',
+				src: 'index_without_suffix.html',
+				dest: '.tmp/with_extracted_suffix/'
+			},
+			with_usemin_without_block: {
+				options: {
+					pattern: /\[\[[^\]]+\]\]/,
 					usemin: true,
 					extractedSuffix: '?__inline=true',
-          preProcess: preProccess,
+					preProcess: preProccess,
 					postProcess: postProcess
-        },
-        expand: true,
-        cwd: 'test/fixtures/',
-        src: 'index_with_usemin.html',
-        dest: '.tmp/with_usemin/'
-      }
+				},
+				expand: true,
+				cwd: 'test/fixtures/',
+				src: 'index_without_suffix.html',
+				dest: '.tmp/with_usemin_without_block/'
+			},
+			with_usemin: {
+				options: {
+					pattern: /\[\[[^\]]+\]\]/,
+					usemin: true,
+					extractedSuffix: '?__inline=true',
+					preProcess: preProccess,
+					postProcess: postProcess
+				},
+				expand: true,
+				cwd: 'test/fixtures/',
+				src: 'index_with_usemin.html',
+				dest: '.tmp/with_usemin/'
+			}
 		},
 		concat: {},
 		cssmin: {},
@@ -110,8 +123,8 @@ module.exports = function (grunt) {
 		useminPrepare: {
 			html: 'test/fixtures/index_with_usemin.html',
 			options: {
-				dest: '.tmp',
-				staging: '.tmp'
+				dest: '.tmp/with_usemin/',
+				staging: '.tmp/with_usemin/'
 			}
 		},
 		// Unit tests.

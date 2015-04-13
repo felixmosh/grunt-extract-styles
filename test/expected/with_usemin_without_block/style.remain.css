@@ -1,0 +1,30 @@
+.tpa-first:hover {
+	margin-left: 10px;
+}
+
+.tpa-second {
+	border: 1px solid #000;
+}
+
+.no-tpa {
+	border: 1px solid #000;
+}
+
+@media (min-width: 300px) and (max-width: 730px) {
+	.tpa-first:hover {
+		margin-left: 10px;
+		padding: 5px 2px 5px 2px;
+	}
+
+	.tpa-second {
+		border: 1px solid #000;
+	}
+
+	.no-tpa {
+		border: 1px solid #000;
+	}
+}
+
+.in-the-middle {
+	width: 100%;
+}

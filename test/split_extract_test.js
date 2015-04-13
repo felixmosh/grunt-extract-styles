@@ -114,5 +114,22 @@ exports.split_styles = {
 		test.equal(actualHtml, expectedHtml, 'should split extracted link into 2 links and manipulate usemin to minify the remain file');
 
 		test.done();
+	},
+	with_usemin_without_block: function (test) {
+		test.expect(3);
+
+		var actualExtracted = grunt.file.read('.tmp/with_usemin_without_block/style.remain.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/with_usemin_without_block/wix-style.css').trim();
+		var actualHtml = grunt.file.read('.tmp/with_usemin_without_block/index_without_suffix.html').trim();
+
+		var expectedExtracted = grunt.file.read('test/expected/with_usemin_without_block/style.remain.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/with_usemin_without_block/wix-style.css').trim();
+		var expectedHtml = grunt.file.read('test/expected/with_usemin_without_block/index_without_suffix.html').trim();
+
+		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
+		test.equal(actualRemaining, expectedRemaining, 'should remove styles with tpa params and minify it.');
+		test.equal(actualHtml, expectedHtml, 'should split extracted link into 2 links and manipulate usemin to minify the remain file');
+
+		test.done();
 	}
 };

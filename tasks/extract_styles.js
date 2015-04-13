@@ -159,8 +159,11 @@ function extractStyles(sourceFile, destFiles, options, grunt) {
   grunt.log.ok();
 }
 
-function concatFiles(file, concatFilePath, grunt) {
+function concatFiles(htmlMatches, match, grunt) {
   var config = grunt.config(['concat', 'generated']);
+  var useminDest = grunt.config(['useminPrepare', 'options']).dest;
+  var concatFilePath = match.src.pop();
+  var minFilePath = match.dest;
 
   var files = grunt.task.normalizeMultiTaskFiles(config)
     // Only work on the original src/dest, since files.src is a [GETTER]
@@ -170,33 +173,34 @@ function concatFiles(file, concatFilePath, grunt) {
       return fileItem.dest === concatFilePath;
     });
 
-  var isFullBlock = true;
   files.forEach(function (files) {
-    isFullBlock = isFullBlock && files.src.length > 0;
-
-    files.src.push(file.destFiles.remain);
+    files.src.push(htmlMatches.destFiles.remain);
   });
 
-  // Change link src to the usemin dest
-  var concatFile = path.basename(concatFilePath);
-  var remainFileName = path.basename(file.remainFile);
-  file.replaceLinks[0] = file.replaceLinks[0].replace(remainFileName, concatFile);
-
-  // Append css remain file to src
-  if (isFullBlock) {
-    file.replaceLinks.shift(); // Remove the first link
-  }
+  var pathDiff = path.relative(useminDest, minFilePath);
+  htmlMatches.useminBlockRegex = new RegExp('<!--\\s*build:css(?:\\([^\\(]+\\))?\\s*' + pathDiff.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&") + '\\s*-->');
 
   grunt.config(['concat', 'generated'], config); //save back the modified config
 
-  grunt.log.writeln('Added "' + file.destFiles.remain.cyan + '" to "<!-- build:css({.tmp,app}) ' + concatFilePath.yellow + ' -->" Usemin css block.');
+  grunt.log.writeln('Added "' + htmlMatches.destFiles.remain.cyan + '" to "<!-- build:css ' + pathDiff.yellow + ' -->" Usemin css block.');
+
+  return true;
 }
 
-function concatUseminFiles(ext, file, grunt) {
+function concatUseminFiles(htmlMatches, fileContent, grunt) {
   var config = grunt.config(['cssmin', 'generated']);
-
+  var endsWith;
   if (!config) {
     return false;
+  }
+
+  // Find if there is any css usemin block in the Html
+  var blocksMatch = fileContent.match(/<!--\s*build:css(?:\([^\)]+\))?\s*([^\s]+)\s*-->/);
+  if (!blocksMatch) {
+    return false;
+  }
+  else {
+    endsWith = blocksMatch[1];
   }
 
   // Find cssmin destination(s) matching ext
@@ -205,28 +209,37 @@ function concatUseminFiles(ext, file, grunt) {
       return files.orig;
     })
     .filter(function (files) {
-      return ext === files.dest.substr(-ext.length);
+      return endsWith === files.dest.substr(-endsWith.length);
     });
 
   // *Something* should've matched
   if (!matches.length) {
-    grunt.log.warn('Could not find usemin.generated path matching: ' + ext.red);
+    grunt.log.warn('Could not find usemin.generated path matching: ' + endsWith.red);
 
     return false;
   }
 
   var match = matches.shift();
-
-  var concatFilePath = match.src.pop();
-
   // Finally, modify concat target sourced by matching uglify target
-  concatFiles(file, concatFilePath, grunt);
+  return concatFiles(htmlMatches, match, grunt);
 }
 
 function handleHTML(fileContent, options, match, grunt) {
 
-  if (options.usemin) {
-    concatUseminFiles('.css', match, grunt);
+  if (options.usemin && concatUseminFiles(match, fileContent, grunt)) {
+    var startBlockPos;
+    var useminEndBlock = '<!-- endbuild -->';
+    if ((startBlockPos = fileContent.search(match.useminBlockRegex)) > -1) {
+      var endBlockPos = fileContent.indexOf(useminEndBlock, startBlockPos);
+      if (endBlockPos > -1) {
+        var slice = fileContent.substr(startBlockPos, endBlockPos - startBlockPos);
+        fileContent = fileContent.replace(slice, slice + match.replaceLinks[0] + '\n\t');
+        match.replaceLinks.shift();
+      }
+      else {
+        grunt.log.warn('Could not find "' + useminEndBlock.red + '" block.');
+      }
+    }
   }
 
   fileContent = fileContent.replace(match.originalLink, match.replaceLinks.join('\n\t'));
