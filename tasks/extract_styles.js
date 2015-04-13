@@ -178,7 +178,6 @@ function concatFiles(htmlMatches, match, grunt) {
   });
 
   var pathDiff = path.relative(useminDest, minFilePath);
-  htmlMatches.useminBlockRegex = new RegExp('<!--\\s*build:css(?:\\([^\\(]+\\))?\\s*' + pathDiff.replace(/[.*+?^${}()|[\]\\\/]/g, "\\$&") + '\\s*-->');
 
   grunt.config(['concat', 'generated'], config); //save back the modified config
 
@@ -187,20 +186,10 @@ function concatFiles(htmlMatches, match, grunt) {
   return true;
 }
 
-function concatUseminFiles(htmlMatches, fileContent, grunt) {
+function concatUseminFiles(endsWith, htmlMatches, fileContent, grunt) {
   var config = grunt.config(['cssmin', 'generated']);
-  var endsWith;
   if (!config) {
     return false;
-  }
-
-  // Find if there is any css usemin block in the Html
-  var blocksMatch = fileContent.match(/<!--\s*build:css(?:\([^\)]+\))?\s*([^\s]+)\s*-->/);
-  if (!blocksMatch) {
-    return false;
-  }
-  else {
-    endsWith = blocksMatch[1];
   }
 
   // Find cssmin destination(s) matching ext
@@ -224,21 +213,25 @@ function concatUseminFiles(htmlMatches, fileContent, grunt) {
   return concatFiles(htmlMatches, match, grunt);
 }
 
-function handleHTML(fileContent, options, match, grunt) {
+function findUseminCssBlock(fileContent) {
+  // Find if there is any css usemin block in the Html
+  return fileContent.match(/<!--\s*build:css(?:\([^\)]+\))?\s*([^\s]+)\s*-->/);
+}
 
-  if (options.usemin && concatUseminFiles(match, fileContent, grunt)) {
-    var startBlockPos;
+function handleHTML(fileContent, options, match, grunt) {
+  var useminCssBlock = findUseminCssBlock(fileContent);
+  if (options.usemin && useminCssBlock) {
+    concatUseminFiles(useminCssBlock[1], match, fileContent, grunt);
+    var startBlockPos = useminCssBlock.index;
     var useminEndBlock = '<!-- endbuild -->';
-    if ((startBlockPos = fileContent.search(match.useminBlockRegex)) > -1) {
-      var endBlockPos = fileContent.indexOf(useminEndBlock, startBlockPos);
-      if (endBlockPos > -1) {
-        var slice = fileContent.substr(startBlockPos, endBlockPos - startBlockPos);
-        fileContent = fileContent.replace(slice, slice + match.replaceLinks[0] + '\n\t');
-        match.replaceLinks.shift();
-      }
-      else {
-        grunt.log.warn('Could not find "' + useminEndBlock.red + '" block.');
-      }
+    var endBlockPos = fileContent.indexOf(useminEndBlock, startBlockPos);
+    if (endBlockPos > -1) {
+      var slice = fileContent.substr(startBlockPos, endBlockPos - startBlockPos);
+      fileContent = fileContent.replace(slice, slice + match.replaceLinks[0] + '\n\t');
+      match.replaceLinks.shift();
+    }
+    else {
+      grunt.log.warn('Could not find "' + useminEndBlock.red + '" block.');
     }
   }
 
