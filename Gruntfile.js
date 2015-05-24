@@ -88,6 +88,18 @@ module.exports = function (grunt) {
 				src: 'index_without_suffix.html',
 				dest: '.tmp/with_extracted_suffix/'
 			},
+			without_extracted_filename: {
+				options: {
+					pattern: /\[\[[^\]]+\]\]/,
+					extractedSuffix: '?extracted-suffix=true',
+					preProcess: preProccess,
+					postProcess: postProcess
+				},
+				expand: true,
+				cwd: 'test/fixtures/',
+				src: 'index_without_extracted_filename.html',
+				dest: '.tmp/without_extracted_filename/'
+			},
 			with_usemin_without_block: {
 				options: {
 					pattern: /\[\[[^\]]+\]\]/,

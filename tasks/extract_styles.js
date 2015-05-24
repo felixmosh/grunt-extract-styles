@@ -19,7 +19,7 @@ function getMatches(fileContent, options, sourceDir, destDir) {
     var sourceFilePath = path.normalize(hrefLink).split(options.linkIdentifier)[0];
     var pos = sourceFilePath.lastIndexOf('.');
     var remainFilePath = sourceFilePath.substring(0, pos) + options.remainSuffix + sourceFilePath.substring(pos);
-    var destFile = matches[2];
+    var destFile = matches[2] || (sourceFilePath.substring(0, pos) + options.extractedFileSuffix + sourceFilePath.substring(pos));
     var extractedFilePath = sourceFilePath;
     extractedFilePath = (extractedFilePath.indexOf('/') > -1) ? path.dirname(extractedFilePath) + '/' : '';
     extractedFilePath += destFile;
@@ -249,6 +249,7 @@ module.exports = function (grunt) {
       preProcess: null,
       postProcess: null,
       remainSuffix: '.remain', // remaining filename suffix
+      extractedFileSuffix: '.extracted', // extracted filename suffix
       extractedSuffix: '', // suffix for the extracted file link
       linkIdentifier: '?__extractStyles', // The identifier of link src
       usemin: false // if true, the remaining link will be added to the last Usemin css block
@@ -259,7 +260,7 @@ module.exports = function (grunt) {
       return;
     }
 
-    options.linkPattern = new RegExp('<link.*href="(.*' + options.linkIdentifier + '=([^"]+))".*>', 'g');
+    options.linkPattern = new RegExp('<link.*href="(.*' + options.linkIdentifier + '(?:=([^"]+))?)".*>', 'g');
 
     // Iterate over all specified file groups.
     this.files.forEach(function (file) {

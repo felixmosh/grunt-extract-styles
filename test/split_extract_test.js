@@ -81,6 +81,24 @@ exports.split_styles = {
 
 		test.done();
 	},
+	without_extracted_filename: function (test) {
+		test.expect(3);
+
+		var actualExtracted = grunt.file.read('.tmp/without_extracted_filename/style.extracted.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/without_extracted_filename/style.remain.css').trim();
+		var actualHtml = grunt.file.read('.tmp/without_extracted_filename/index_without_extracted_filename.html').trim();
+
+		var expectedExtracted = grunt.file.read('test/expected/without_extracted_filename/style.extracted.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/without_extracted_filename/style.remain.css').trim();
+		var expectedHtml = grunt.file.read('test/expected/without_extracted_filename/index.html').trim();
+
+		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
+		test.equal(actualRemaining, expectedRemaining, 'should not remove styles with tpa params.');
+		test.equal(actualHtml, expectedHtml, 'should split extracted link into 2 links');
+
+
+		test.done();
+	},
 	with_extracted_suffix: function (test) {
 		test.expect(3);
 
