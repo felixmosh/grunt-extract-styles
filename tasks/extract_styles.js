@@ -47,77 +47,64 @@ function getMatches(fileContent, options, sourceDir, destDir) {
   return destFilePaths;
 }
 
-function handleDeclaration(decl, newRule, options) {
-  if (options.pattern.test(decl.toString())) {
-    var newDecl = decl.clone();
-    newDecl.before = decl.before;
-    newRule.append(newDecl);
+function handleDeclarations(rule, newRule, options) {
+  rule.eachDecl(function (decl) {
+    if (options.pattern.test(decl.toString())) {
+      var newDecl = decl.clone();
+      newDecl.before = decl.before;
+      newRule.append(newDecl);
 
-    if (options.remove) {
-      decl.removeSelf();
+      if (options.remove) {
+        decl.removeSelf();
+
+        if (rule.decls.length === 0) {
+          rule.removeSelf();
+        }
+      }
     }
-  }
+  });
+}
+
+function cloneRule(rule) {
+  var newRule = rule.clone();
+
+  newRule.eachDecl(function (decl) {
+    decl.removeSelf();
+  });
+  return newRule;
+}
+
+function cloneAtRole(rule) {
+  var newAtRule = rule.clone();
+  newAtRule.eachRule(function (childRule) {
+    childRule.removeSelf();
+  });
+  return newAtRule;
 }
 
 function parseCss(css, options, newCSS) {
-  if (options.pattern) {
-    var atRules = {};
+  css.each(function (rule) {
+    if (rule.type === 'atrule') {
+      var newAtRule = cloneAtRole(rule);
+      parseCss(rule, options, newAtRule);
 
-    css.eachRule(function (rule) {
-      var newRule = rule.clone();
-
-      newRule.eachDecl(function (decl) {
-        decl.removeSelf();
-      });
-
-      if (rule.parent.type === 'root') {
-        rule.eachDecl(function (decl) {
-          handleDeclaration(decl, newRule, options);
-        });
-
-        if (newRule.decls.length) {
-          newCSS.append(newRule);
-        }
-
+      if (newAtRule.rules.length) {
+        newCSS.append(newAtRule);
       }
-      else if (rule.parent.name === 'media') {
-        var newAtRule = rule.parent.clone();
-        newAtRule.eachRule(function (childRule) {
-          childRule.removeSelf();
-        });
-
-        var atRuleKey = newAtRule.params + '';
-        if (!atRules.hasOwnProperty(atRuleKey)) {
-          atRules[atRuleKey] = newAtRule;
-        }
-        else {
-          newAtRule = atRules[atRuleKey];
-        }
-
-        rule.eachDecl(function (decl) {
-          handleDeclaration(decl, newRule, options);
-        });
-
-        if (newRule.decls.length) {
-          newAtRule.append(newRule);
-        }
-      }
-
-      if (rule.decls.length === 0) {
+      if (options.remove && rule.rules.length === 0) {
         rule.removeSelf();
       }
+    }
+    else {
+      var newRule = cloneRule(rule);
 
-      if (rule.parent.rules.length === 0) {
-        rule.parent.removeSelf();
-      }
-    });
+      handleDeclarations(rule, newRule, options);
 
-    for (var key in atRules) {
-      if (atRules.hasOwnProperty(key)) {
-        newCSS.append(atRules[key]);
+      if (newRule.decls.length) {
+        newCSS.append(newRule);
       }
     }
-  }
+  });
 }
 
 function extractStyles(sourceFile, destFiles, options, grunt) {
@@ -142,7 +129,6 @@ function extractStyles(sourceFile, destFiles, options, grunt) {
 
   // Run the postprocessor
   output = processor.process(css, processOptions);
-
   if (typeof options.postProcess === 'function') {
     newCSS = options.postProcess(newCSS.toString());
     output.css = options.postProcess(output.css);

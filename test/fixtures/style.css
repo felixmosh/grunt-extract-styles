@@ -37,6 +37,11 @@
 	}
 }
 
+@keyframes identifier {
+	0% { color: {{xxx yyy}}; }
+	100% { color:#000; }
+}
+
 .in-the-middle {
 	width: 100%;
 }

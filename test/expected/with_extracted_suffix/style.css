@@ -25,6 +25,10 @@
 	}
 }
 
+@keyframes identifier {
+	100% { color:#000; }
+}
+
 .in-the-middle {
 	width: 100%;
 }
