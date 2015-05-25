@@ -56,11 +56,18 @@ Default: `.remain`
 
 The filename suffix of the remaining content. (`style.css` => `style.remain.css`)
 
+#### options.extractedFileSuffix
+Type: `string`
+Default: '.extracted'
+
+The filename suffix of the extracted content. (`style.css` => `style.extracted.css`)
+If the `Link` tag doesn't contains a file name for the extracted content, the file name will be the original filename with that suffix.
+
 #### options.extractedSuffix
 Type: `string`
 Default: ``
 
-suffix for the extracted file link. (with `extractedSuffix="?inline=true"` `extracted.css` => `extracted.css?inline=true`)
+suffix for the extracted file link. (with `extractedSuffix:"?inline=true"` `extracted.css` => `extracted.css?inline=true`)
 
 #### options.linkIdentifier
 Type: `string`
@@ -68,7 +75,7 @@ Default: `?__extractStyles`
 
 Identifier of the links in the HTML to extract from. This string will convert to the following `Regex`: 
 ```js
-<link.*href="(.*' + linkIdentifier + '=([^"]+))".*>
+'<link.*href="(.*' + linkIdentifier + '(?:=([^"]+))?)".*>'
 ```
 
 #### options.usemin
