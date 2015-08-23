@@ -34,12 +34,12 @@ function getMatches(fileContent, options, sourceDir, destDir) {
         replaceOrgLink,
         replaceExtractedLink
       ],
-      sourceFile: sourceDir + sourceFilePath,
+      sourceFile: path.join(sourceDir, sourceFilePath),
       remainFile: remainFilePath,
       destFiles: {
-        source: destDir + sourceFilePath,
-        remain: destDir + remainFilePath,
-        extracted: destDir + extractedFilePath.split('?')[0]
+        source: path.join(destDir, sourceFilePath),
+        remain: path.join(destDir, remainFilePath),
+        extracted: path.join(destDir, extractedFilePath.split('?')[0])
       }
     });
   }
@@ -71,20 +71,31 @@ function cloneRule(rule) {
   newRule.eachDecl(function (decl) {
     decl.removeSelf();
   });
+
+  newRule.eachComment(function(comment){
+    comment.removeSelf();
+  });
+
   return newRule;
 }
 
 function cloneAtRole(rule) {
   var newAtRule = rule.clone();
+
   newAtRule.eachRule(function (childRule) {
     childRule.removeSelf();
   });
+
+  newAtRule.eachComment(function(comment){
+    comment.removeSelf();
+  });
+
   return newAtRule;
 }
 
 function parseCss(css, options, newCSS) {
   css.each(function (rule) {
-    if (rule.type === 'atrule') {
+    if (rule.type === 'atrule' && rule.eachRule) {
       var newAtRule = cloneAtRole(rule);
       parseCss(rule, options, newAtRule);
 
@@ -95,7 +106,7 @@ function parseCss(css, options, newCSS) {
         rule.removeSelf();
       }
     }
-    else {
+    else if(rule.type ==='rule' && rule.eachDecl) {
       var newRule = cloneRule(rule);
 
       handleDeclarations(rule, newRule, options);
@@ -270,7 +281,7 @@ module.exports = function (grunt) {
                 filepath = filepath.replace(baseDir, '');
               }
 
-              grunt.file.write(destDir + filepath, htmlFileContent);
+              grunt.file.write(path.join(destDir, filepath), htmlFileContent);
 
               grunt.log.write('Extracted styles from ' + match.sourceFile + '. - ');
               grunt.log.ok();
