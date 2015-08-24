@@ -34,7 +34,7 @@ exports.split_styles = {
 		var actualRemaining = grunt.file.read('.tmp/default_task/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/default_task/index.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/default_task/style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/default_task/style.remain.css').trim();
 		var expectedRemaining = grunt.file.read('test/expected/default_task/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/default_task/index.html').trim();
 
@@ -52,7 +52,7 @@ exports.split_styles = {
 		var actualRemaining = grunt.file.read('.tmp/without_remove/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/without_remove/index.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/without_remove/style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/without_remove/style.remain.css').trim();
 		var expectedRemaining = grunt.file.read('test/expected/without_remove/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/without_remove/index.html').trim();
 
@@ -70,7 +70,7 @@ exports.split_styles = {
 		var actualRemaining = grunt.file.read('.tmp/with_remain/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/with_remain/index.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/with_remain/style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/with_remain/style_rest.css').trim();
 		var expectedRemaining = grunt.file.read('test/expected/with_remain/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/with_remain/index.html').trim();
 
@@ -106,7 +106,7 @@ exports.split_styles = {
 		var actualRemaining = grunt.file.read('.tmp/with_extracted_suffix/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/with_extracted_suffix/index_without_suffix.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/with_extracted_suffix/style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/with_extracted_suffix/style.remain.css').trim();
 		var expectedRemaining = grunt.file.read('test/expected/with_extracted_suffix/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/with_extracted_suffix/index.html').trim();
 

@@ -15,6 +15,7 @@
 }
 
 .only-tpa {
+	/* comment */
 	color: {{tpa-color-2}};
 }
 

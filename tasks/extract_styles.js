@@ -48,17 +48,17 @@ function getMatches(fileContent, options, sourceDir, destDir) {
 }
 
 function handleDeclarations(rule, newRule, options) {
-  rule.eachDecl(function (decl) {
+  rule.walkDecls(function (decl) {
     if (options.pattern.test(decl.toString())) {
       var newDecl = decl.clone();
-      newDecl.before = decl.before;
+      newDecl.raws = decl.raws;
       newRule.append(newDecl);
 
       if (options.remove) {
-        decl.removeSelf();
+        decl.remove();
 
-        if (rule.decls.length === 0) {
-          rule.removeSelf();
+        if (rule.nodes.length === 0) {
+          rule.remove();
         }
       }
     }
@@ -67,52 +67,49 @@ function handleDeclarations(rule, newRule, options) {
 
 function cloneRule(rule) {
   var newRule = rule.clone();
+  newRule.raws = rule.raws;
 
-  newRule.eachDecl(function (decl) {
-    decl.removeSelf();
-  });
-
-  newRule.eachComment(function(comment){
-    comment.removeSelf();
-  });
+  newRule.removeAll();
 
   return newRule;
 }
 
 function cloneAtRole(rule) {
   var newAtRule = rule.clone();
+  newAtRule.raws = rule.raws;
 
-  newAtRule.eachRule(function (childRule) {
-    childRule.removeSelf();
-  });
-
-  newAtRule.eachComment(function(comment){
-    comment.removeSelf();
-  });
+  newAtRule.removeAll();
 
   return newAtRule;
 }
 
 function parseCss(css, options, newCSS) {
   css.each(function (rule) {
-    if (rule.type === 'atrule' && rule.eachRule) {
+    if (rule.type === 'atrule' && rule.walkRules) {
       var newAtRule = cloneAtRole(rule);
       parseCss(rule, options, newAtRule);
 
-      if (newAtRule.rules.length) {
+      if (newAtRule.nodes.length) {
         newCSS.append(newAtRule);
       }
-      if (options.remove && rule.rules.length === 0) {
-        rule.removeSelf();
+      if (options.remove && !rule.nodes.some(function (rule) {
+          return rule.type !== 'comment';
+        })) {
+        rule.remove();
       }
     }
-    else if(rule.type ==='rule' && rule.eachDecl) {
+    else if (rule.type === 'rule' && rule.walkDecls) {
       var newRule = cloneRule(rule);
 
       handleDeclarations(rule, newRule, options);
-
-      if (newRule.decls.length) {
+      if (newRule.nodes.length) {
         newCSS.append(newRule);
+      }
+
+      if (options.remove && !rule.nodes.some(function (decl) {
+          return decl.type !== 'comment';
+        })) {
+        rule.remove();
       }
     }
   });
@@ -127,33 +124,31 @@ function extractStyles(sourceFile, destFiles, options, grunt) {
   });
 
   // Read file source.
-  var css = grunt.file.read(sourceFile),
-    processOptions = {},
-    output;
-
-  processOptions.from = sourceFile;
-  processOptions.to = destFiles.extracted;
+  var css = grunt.file.read(sourceFile);
 
   if (typeof options.preProcess === 'function') {
     css = options.preProcess(css);
   }
 
   // Run the postprocessor
-  output = processor.process(css, processOptions);
-  if (typeof options.postProcess === 'function') {
-    newCSS = options.postProcess(newCSS.toString());
-    output.css = options.postProcess(output.css);
-  }
+  return processor.process(css).then(function (result) {
+    var output = result.css;
+    newCSS = newCSS.toString();
+    if (typeof options.postProcess === 'function') {
+      newCSS = options.postProcess(newCSS);
+      output = options.postProcess(output);
+    }
 
-  // Write the newly split file.
-  grunt.file.write(destFiles.extracted, newCSS);
-  grunt.log.write('File "' + destFiles.extracted + '" was created. - ');
-  grunt.log.ok();
+    // Write the newly split file.
+    grunt.file.write(destFiles.extracted, newCSS);
+    grunt.log.write('File "' + destFiles.extracted + '" was created. - ');
+    grunt.log.ok();
 
-  // Write the destination file
-  grunt.file.write(destFiles.remain, output.css);
-  grunt.log.write('File "' + destFiles.remain + '" was created. - ');
-  grunt.log.ok();
+    // Write the destination file
+    grunt.file.write(destFiles.remain, output);
+    grunt.log.write('File "' + destFiles.remain + '" was created. - ');
+    grunt.log.ok();
+  });
 }
 
 function concatFiles(htmlMatches, match, grunt) {
@@ -273,18 +268,18 @@ module.exports = function (grunt) {
             if (!grunt.file.exists(match.sourceFile)) {
               grunt.fail.warn('Source file "' + match.sourceFile + '" not found.');
             } else {
-              extractStyles(match.sourceFile, match.destFiles, options, grunt);
+              extractStyles(match.sourceFile, match.destFiles, options, grunt).then(function () {
+                htmlFileContent = handleHTML(htmlFileContent, options, match, grunt);
 
-              htmlFileContent = handleHTML(htmlFileContent, options, match, grunt);
+                if (file.orig.expand) {
+                  filepath = filepath.replace(baseDir, '');
+                }
 
-              if (file.orig.expand) {
-                filepath = filepath.replace(baseDir, '');
-              }
+                grunt.file.write(path.join(destDir, filepath), htmlFileContent);
 
-              grunt.file.write(path.join(destDir, filepath), htmlFileContent);
-
-              grunt.log.write('Extracted styles from ' + match.sourceFile + '. - ');
-              grunt.log.ok();
+                grunt.log.write('Extracted styles from ' + match.sourceFile + '. - ');
+                grunt.log.ok();
+              });
             }
           }
         );
