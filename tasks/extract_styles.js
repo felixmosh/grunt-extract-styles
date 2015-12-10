@@ -17,9 +17,9 @@ function getMatches(fileContent, options, sourceDir, destDir) {
   while (matches = options.linkPattern.exec(fileContent)) {
     var hrefLink = matches[1];
     var sourceFilePath = path.normalize(hrefLink).split(options.linkIdentifier)[0];
-    var pos = sourceFilePath.lastIndexOf('.');
-    var remainFilePath = sourceFilePath.substring(0, pos) + options.remainSuffix + sourceFilePath.substring(pos);
-    var destFile = matches[2] || (sourceFilePath.substring(0, pos) + options.extractedFileSuffix + sourceFilePath.substring(pos));
+    var extension = path.extname(sourceFilePath);
+    var remainFilePath = sourceFilePath.replace(extension, options.remainSuffix + extension);
+    var destFile = matches[2] || (path.basename(sourceFilePath).replace(extension, options.extractedFileSuffix + extension));
     var extractedFilePath = sourceFilePath;
     extractedFilePath = (extractedFilePath.indexOf('/') > -1) ? path.dirname(extractedFilePath) + '/' : '';
     extractedFilePath += destFile;

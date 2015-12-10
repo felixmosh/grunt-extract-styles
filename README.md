@@ -2,6 +2,7 @@
 [![Built with Grunt](https://img.shields.io/badge/Built%20with-GruntJS-yellow.svg?style=flat)](http://gruntjs.com/)
 [![NPM version](https://img.shields.io/npm/v/grunt-extract-styles.svg?style=flat)](https://www.npmjs.com/package/grunt-extract-styles)
 [![Build Status](https://travis-ci.org/felixmosh/grunt-extract-styles.svg?branch=master)](https://travis-ci.org/felixmosh/grunt-extract-styles)
+[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 > Extract styles from css file based on decelerations matching.
 
 ## Getting Started

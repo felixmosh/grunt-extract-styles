@@ -24,13 +24,14 @@
     "test": "grunt test"
   },
   "devDependencies": {
+    "cz-conventional-changelog": "^1.1.5",
     "grunt": "~0.4.2",
     "grunt-contrib-clean": "~0.4.0",
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-cssmin": "^0.12.2",
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-nodeunit": "~0.2.0",
-    "grunt-usemin": "^3.0.0"
+    "grunt-usemin": "~3.0.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.2"
@@ -43,5 +44,10 @@
   ],
   "dependencies": {
     "postcss": "^5.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

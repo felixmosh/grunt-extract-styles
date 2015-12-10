@@ -30,12 +30,12 @@ exports.split_styles = {
 	default_task: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/default_task/style.remain.css').trim();
-		var actualRemaining = grunt.file.read('.tmp/default_task/wix-style.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/default_task/styles/style.remain.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/default_task/styles/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/default_task/index.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/default_task/style.remain.css').trim();
-		var expectedRemaining = grunt.file.read('test/expected/default_task/wix-style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/default_task/styles/style.remain.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/default_task/styles/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/default_task/index.html').trim();
 
 		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
@@ -48,12 +48,12 @@ exports.split_styles = {
 	without_remove: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/without_remove/style.remain.css').trim();
-		var actualRemaining = grunt.file.read('.tmp/without_remove/wix-style.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/without_remove/styles/style.remain.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/without_remove/styles/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/without_remove/index.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/without_remove/style.remain.css').trim();
-		var expectedRemaining = grunt.file.read('test/expected/without_remove/wix-style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/without_remove/styles/style.remain.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/without_remove/styles/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/without_remove/index.html').trim();
 
 		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
@@ -66,12 +66,12 @@ exports.split_styles = {
   with_remain: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/with_remain/style_rest.css').trim();
-		var actualRemaining = grunt.file.read('.tmp/with_remain/wix-style.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/with_remain/styles/style_rest.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/with_remain/styles/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/with_remain/index.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/with_remain/style_rest.css').trim();
-		var expectedRemaining = grunt.file.read('test/expected/with_remain/wix-style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/with_remain/styles/style_rest.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/with_remain/styles/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/with_remain/index.html').trim();
 
 		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
@@ -84,13 +84,13 @@ exports.split_styles = {
 	without_extracted_filename: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/without_extracted_filename/style.extracted.css').trim();
-		var actualRemaining = grunt.file.read('.tmp/without_extracted_filename/style.remain.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/without_extracted_filename/styles/style.extracted.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/without_extracted_filename/styles/style.remain.css').trim();
 		var actualHtml = grunt.file.read('.tmp/without_extracted_filename/index_without_extracted_filename.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/without_extracted_filename/style.extracted.css').trim();
-		var expectedRemaining = grunt.file.read('test/expected/without_extracted_filename/style.remain.css').trim();
-		var expectedHtml = grunt.file.read('test/expected/without_extracted_filename/index.html').trim();
+		var expectedExtracted = grunt.file.read('test/expected/without_extracted_filename/styles/style.extracted.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/without_extracted_filename/styles/style.remain.css').trim();
+		var expectedHtml = grunt.file.read('test/expected/without_extracted_filename/index_without_extracted_filename.html').trim();
 
 		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
 		test.equal(actualRemaining, expectedRemaining, 'should not remove styles with tpa params.');
@@ -102,13 +102,13 @@ exports.split_styles = {
 	with_extracted_suffix: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/with_extracted_suffix/style.remain.css').trim();
-		var actualRemaining = grunt.file.read('.tmp/with_extracted_suffix/wix-style.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/with_extracted_suffix/styles/style.remain.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/with_extracted_suffix/styles/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/with_extracted_suffix/index_without_suffix.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/with_extracted_suffix/style.remain.css').trim();
-		var expectedRemaining = grunt.file.read('test/expected/with_extracted_suffix/wix-style.css').trim();
-		var expectedHtml = grunt.file.read('test/expected/with_extracted_suffix/index.html').trim();
+		var expectedExtracted = grunt.file.read('test/expected/with_extracted_suffix/styles/style.remain.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/with_extracted_suffix/styles/wix-style.css').trim();
+		var expectedHtml = grunt.file.read('test/expected/with_extracted_suffix/index_without_suffix.html').trim();
 
 		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
 		test.equal(actualRemaining, expectedRemaining, 'should remove styles with tpa params.');
@@ -120,11 +120,11 @@ exports.split_styles = {
 		test.expect(3);
 
 		var actualExtracted = grunt.file.read('.tmp/with_usemin/main.css').trim();
-		var actualRemaining = grunt.file.read('.tmp/with_usemin/wix-style.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/with_usemin/styles/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/with_usemin/index_with_usemin.html').trim();
 
 		var expectedExtracted = grunt.file.read('test/expected/with_usemin/main.css').trim();
-		var expectedRemaining = grunt.file.read('test/expected/with_usemin/wix-style.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/with_usemin/styles/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/with_usemin/index_with_usemin.html').trim();
 
 		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
@@ -136,12 +136,12 @@ exports.split_styles = {
 	with_usemin_without_block: function (test) {
 		test.expect(3);
 
-		var actualExtracted = grunt.file.read('.tmp/with_usemin_without_block/style.remain.css').trim();
-		var actualRemaining = grunt.file.read('.tmp/with_usemin_without_block/wix-style.css').trim();
+		var actualExtracted = grunt.file.read('.tmp/with_usemin_without_block/styles/style.remain.css').trim();
+		var actualRemaining = grunt.file.read('.tmp/with_usemin_without_block/styles/wix-style.css').trim();
 		var actualHtml = grunt.file.read('.tmp/with_usemin_without_block/index_without_suffix.html').trim();
 
-		var expectedExtracted = grunt.file.read('test/expected/with_usemin_without_block/style.remain.css').trim();
-		var expectedRemaining = grunt.file.read('test/expected/with_usemin_without_block/wix-style.css').trim();
+		var expectedExtracted = grunt.file.read('test/expected/with_usemin_without_block/styles/style.remain.css').trim();
+		var expectedRemaining = grunt.file.read('test/expected/with_usemin_without_block/styles/wix-style.css').trim();
 		var expectedHtml = grunt.file.read('test/expected/with_usemin_without_block/index_without_suffix.html').trim();
 
 		test.equal(actualExtracted, expectedExtracted, 'should create a file with only styles wix tpa params.');
