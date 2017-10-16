@@ -254,6 +254,8 @@ module.exports = function (grunt) {
 
     options.linkPattern = new RegExp('<link.*href="(.*' + options.linkIdentifier + '(?:=([^"]+))?)".*>', 'g');
 
+    var done = this.async();
+    var extractions = [];
     // Iterate over all specified file groups.
     this.files.forEach(function (file) {
       file.src.forEach(function (filepath) {
@@ -268,7 +270,7 @@ module.exports = function (grunt) {
             if (!grunt.file.exists(match.sourceFile)) {
               grunt.fail.warn('Source file "' + match.sourceFile + '" not found.');
             } else {
-              extractStyles(match.sourceFile, match.destFiles, options, grunt).then(function () {
+              var extraction = extractStyles(match.sourceFile, match.destFiles, options, grunt).then(function () {
                 htmlFileContent = handleHTML(htmlFileContent, options, match, grunt);
 
                 if (file.orig.expand) {
@@ -280,10 +282,16 @@ module.exports = function (grunt) {
                 grunt.log.write('Extracted styles from ' + match.sourceFile + '. - ');
                 grunt.log.ok();
               });
+
+              extractions.push(extraction);
             }
           }
         );
       });
+    });
+
+    Promise.all(extractions).then(function() {
+      done();
     });
   });
 };
